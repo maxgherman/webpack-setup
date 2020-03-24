@@ -1,9 +1,9 @@
-import webpack, { Configuration } from 'webpack';
+import webpack, { Configuration } from 'webpack'
 import Environments from './environments.js'
 import { getParts } from './parts'
 
 const environments = Environments()
-console.log(`Running webpack config for environment: ${environments.current}`);
+console.log(`Running webpack config for environment: ${environments.current}`)
 
 const parts = getParts()
 
@@ -16,6 +16,8 @@ const config: Configuration = {
     entry: parts.entry,
 
     output: parts.output,
+
+    resolve: parts.resolve,
 
     module: parts.module,
 

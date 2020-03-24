@@ -1,6 +1,6 @@
 {
     "editor.formatOnSave": false,
-    "editor.autoIndent": "advanced" ,
+    "editor.autoIndent": "advanced",
     "editor.renderWhitespace": "none",
     "editor.rulers": [
         140
@@ -10,5 +10,14 @@
     "files.insertFinalNewline": true,
     "search.exclude": {
         "node_modules/**": true
-    }
+    },
+    "eslint.validate": [
+        "javascript",
+        "javascriptreact",
+        "typescript",
+        "typescriptreact"
+    ],
+    "eslint.workingDirectories": [
+        "./src"
+    ]
 }

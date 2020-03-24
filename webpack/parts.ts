@@ -1,13 +1,13 @@
-import path from 'path';
-import webpack, { Entry, Output, Node, Plugin, Module } from 'webpack';
+import path from 'path'
+import webpack, { Entry, Output, Node, Resolve, Plugin, Module } from 'webpack'
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import HtmlWebpackHarddiskPlugin from 'html-webpack-harddisk-plugin';
-import { CleanWebpackPlugin } from 'clean-webpack-plugin';
+import { CleanWebpackPlugin } from 'clean-webpack-plugin'
 
 export const distFolder = () => path.resolve(__dirname, '../dist')
 
 export const getParts = () => ({
-    context: path.join(__dirname, '../src', 'app'),
+    context: path.join(__dirname, '../src'),
 
     entry: {
         main: './index',
@@ -23,10 +23,14 @@ export const getParts = () => ({
         fs: 'empty'
     } as Node,
 
+    resolve: {
+        extensions: ['.ts', '.js', '.json']
+    } as Resolve,
+
     module: {
         rules: [{
-            // Include js files.
-            test: /\.js$/,
+            // Include ts/js files.
+            test: /\.(ts)|(js)$/,
 
             exclude: [ // https://github.com/webpack/webpack/issues/6544
                 /node_modules/,

@@ -3,22 +3,22 @@
 const values = Object.freeze({
     Prod: 'production',
     Development: 'development'
-});
+})
 
 /**
  * @param {string=} env
  */
 module.exports = (env) => {
 
-    env = env || process.env.NODE_ENV;
+    env = env || process.env.NODE_ENV
 
     return {
         get isProduction() {
-            return env === values.Prod;
+            return env === values.Prod
         },
 
         get isDevelopment() {
-            return env === values.Development;
+            return env === values.Development
         },
 
         get isForAnalysis() {
@@ -26,7 +26,7 @@ module.exports = (env) => {
         },
 
         get current() {
-            return env;
+            return env
         }
-    };
-};
+    }
+}

@@ -33,8 +33,10 @@ const config: Configuration = {
     ],
 
     optimization: {
+        ...parts.optimization,
+
         minimize: true,
-        removeAvailableModules: true
+        removeAvailableModules: true,
     }
 }
 

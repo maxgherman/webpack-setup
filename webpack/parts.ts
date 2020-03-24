@@ -1,5 +1,5 @@
 import path from 'path'
-import webpack, { Entry, Output, Node, Resolve, Plugin, Module } from 'webpack'
+import webpack, { Entry, Output, Node, Resolve, Plugin, Module, Options } from 'webpack'
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import HtmlWebpackHarddiskPlugin from 'html-webpack-harddisk-plugin';
 import { CleanWebpackPlugin } from 'clean-webpack-plugin'
@@ -11,12 +11,13 @@ export const getParts = () => ({
 
     entry: {
         main: './index',
+        utils: './utils/index'
     } as Entry,
 
     output: {
         path: path.resolve(distFolder(), 'js'),
         filename: '[name].bundle.js',
-        publicPath: '/js'
+        publicPath: '/js/'
     } as Output,
 
     node: {
@@ -48,5 +49,20 @@ export const getParts = () => ({
         }),
         new HtmlWebpackHarddiskPlugin(),
         new CleanWebpackPlugin({ verbose: true })
-    ] as Plugin[]
+    ] as Plugin[],
+
+    optimization: {
+        splitChunks: {
+            cacheGroups: {
+                vendors: {
+                    test: /[\\/]node_modules[\\/]/i,
+                    name: 'vendors',
+                    chunks: 'all'
+                }
+            }
+        },
+        runtimeChunk: {
+            name: 'vendors'
+        }
+    } as Options.Optimization
 })

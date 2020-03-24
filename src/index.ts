@@ -9,11 +9,17 @@ if (module.hot) {
 }
 /* eslint-enable @typescript-eslint/ban-ts-ignore */
 
-import func from '@app'
-import feature from '@app/feature'
+import func, { DynamicImport } from '@app'
 import { toCapital } from '@utils'
 
 const f = func()
 f.next()
-f.next(toCapital('hello world'))
-console.log(feature())
+
+setTimeout((): void => {
+    const next = f.next(toCapital('hello world'));
+
+    (next.value as DynamicImport)
+        .then((data): void => {
+            console.log(data.default())
+        })
+}, 3000)

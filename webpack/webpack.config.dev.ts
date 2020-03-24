@@ -27,6 +27,8 @@ const config: Configuration = {
 
     plugins: parts.plugins,
 
+    optimization: parts.optimization,
+
     devServer: {
         contentBase: distFolder(),
         overlay: true,

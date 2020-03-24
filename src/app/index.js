@@ -1,12 +1,17 @@
 
+import 'core-js/stable'
+import 'regenerator-runtime/runtime'
+
 if (module.hot) {
     module.hot.accept()
 }
 
-const func = () => {
-    console.log('test')
+function* func () {
+    yield console.log('test')
 }
 
-func()
+const f = func()
+f.next()
+f.next()
 
 

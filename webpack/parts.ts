@@ -1,5 +1,5 @@
 import path from 'path';
-import webpack, { Entry, Output, Node, Plugin } from 'webpack';
+import webpack, { Entry, Output, Node, Plugin, Module } from 'webpack';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import HtmlWebpackHarddiskPlugin from 'html-webpack-harddisk-plugin';
 import { CleanWebpackPlugin } from 'clean-webpack-plugin';
@@ -22,6 +22,18 @@ export const getParts = () => ({
     node: {
         fs: 'empty'
     } as Node,
+
+    module: {
+        rules: [{
+            // Include js files.
+            test: /\.js$/,
+
+            exclude: [ // https://github.com/webpack/webpack/issues/6544
+                /node_modules/,
+            ],
+            loader: 'babel-loader',
+         }]
+    } as Module,
 
     plugins: [
         new webpack.EnvironmentPlugin(['NODE_ENV']),

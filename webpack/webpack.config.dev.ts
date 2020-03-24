@@ -19,6 +19,8 @@ const config: Configuration = {
 
     output: parts.output,
 
+    module: parts.module,
+
     node: parts.node,
 
     plugins: parts.plugins,

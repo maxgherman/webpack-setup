@@ -1,6 +1,6 @@
 {
     "editor.formatOnSave": false,
-    "editor.autoIndent": true,
+    "editor.autoIndent": "advanced" ,
     "editor.renderWhitespace": "none",
     "editor.rulers": [
         140

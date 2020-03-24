@@ -1,0 +1,14 @@
+{
+    "editor.formatOnSave": false,
+    "editor.autoIndent": true,
+    "editor.renderWhitespace": "none",
+    "editor.rulers": [
+        140
+    ],
+    "files.encoding": "utf8",
+    "files.trimTrailingWhitespace": true,
+    "files.insertFinalNewline": true,
+    "search.exclude": {
+        "node_modules/**": true
+    }
+}

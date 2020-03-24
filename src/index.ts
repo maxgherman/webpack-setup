@@ -1,6 +1,13 @@
 import 'core-js/stable'
 import 'regenerator-runtime/runtime'
 
+import func, { DynamicImport } from '@app'
+import { createList, appendToBody, appendListItem } from '@utils'
+
+import cssExports from './index.module.css'
+import pcssExports from './index.module.pcss'
+import * as styles from './index.style'
+
 /* eslint-disable @typescript-eslint/ban-ts-ignore */
 //@ts-ignore
 if (module.hot) {
@@ -9,17 +16,29 @@ if (module.hot) {
 }
 /* eslint-enable @typescript-eslint/ban-ts-ignore */
 
-import func, { DynamicImport } from '@app'
-import { toCapital } from '@utils'
-
 const f = func()
-f.next()
+let count = 0
 
-setTimeout((): void => {
-    const next = f.next(toCapital('hello world'));
+const list = createList(styles.list)
+list.className = styles.list
+appendToBody(list)
 
-    (next.value as DynamicImport)
-        .then((data): void => {
-            console.log(data.default())
-        })
-}, 3000)
+const interval = setInterval((): void => {
+    count++
+    const next = f.next('hello world')
+
+    if(next.done) {
+        clearInterval(interval)
+        return
+    }
+
+    if(next.value instanceof Promise) {
+        (next.value as DynamicImport)
+            .then((data): void => {
+                appendListItem(list, cssExports["item-regular"], data.default())
+            })
+    } else {
+        const className = count % 2 == 0 ? pcssExports["item-highligh"]: cssExports["item-regular"]
+        appendListItem(list, className, next.value)
+    }
+}, 1000)

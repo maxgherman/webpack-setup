@@ -21,13 +21,51 @@ const config: Configuration = {
 
     resolve: parts.resolve,
 
-    module: parts.module,
+    module: {
+        rules: [
+            ...parts.rules,
+            {
+                test: /\.css$/,
+                exclude: /\.module\.css$/,
+                use: ['style-loader', 'css-loader']
+            },
+            {
+                test: /\.pcss$/,
+                exclude: /\.module\.pcss$/,
+                use: ['style-loader', 'postcss-loader']
+            },
+            {
+                test: /\.module\.css$/,
+                use: [
+                    'style-loader',
+                    'css-modules-typescript-loader',
+                    {
+                        loader: 'css-loader',
+                        options: {
+                            modules: true,
+                        }
+                    }
+                ]
+            },
+            {
+                test: /\.module\.pcss$/,
+                use: [
+                    'style-loader',
+                    'css-modules-typescript-loader',
+                    {
+                        loader: 'css-loader', options: { modules: true, importLoaders: 1 }
+                    },
+                    'postcss-loader'
+                ]
+            }
+        ]
+    },
 
     node: parts.node,
 
     plugins: parts.plugins,
 
-    optimization: parts.optimization,
+    optimization: parts.optimization(),
 
     devServer: {
         contentBase: distFolder(),

@@ -1,5 +1,5 @@
 import path from 'path'
-import webpack, { Entry, Output, Node, Resolve, Plugin, Module, Options } from 'webpack'
+import webpack, { Entry, Output, Node, Resolve, Plugin, RuleSetRule, Options } from 'webpack'
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import HtmlWebpackHarddiskPlugin from 'html-webpack-harddisk-plugin';
 import { CleanWebpackPlugin } from 'clean-webpack-plugin'
@@ -28,17 +28,16 @@ export const getParts = () => ({
         extensions: ['.ts', '.js', '.json']
     } as Resolve,
 
-    module: {
-        rules: [{
-            // Include ts/js files.
-            test: /\.(ts)|(js)$/,
 
-            exclude: [ // https://github.com/webpack/webpack/issues/6544
-                /node_modules/,
-            ],
-            loader: 'babel-loader',
-         }]
-    } as Module,
+    rules: [{
+        // Include ts/js files.
+        test: /\.(ts)|(js)$/,
+
+        exclude: [ // https://github.com/webpack/webpack/issues/6544
+            /node_modules/,
+        ],
+        loader: 'babel-loader',
+    }] as RuleSetRule[] ,
 
     plugins: [
         new webpack.EnvironmentPlugin(['NODE_ENV']),
@@ -48,21 +47,28 @@ export const getParts = () => ({
             alwaysWriteToDisk: true
         }),
         new HtmlWebpackHarddiskPlugin(),
-        new CleanWebpackPlugin({ verbose: true })
+        new CleanWebpackPlugin({
+            cleanOnceBeforeBuildPatterns: [
+                path.resolve(__dirname, '../dist/css/**/*'),
+                path.resolve(__dirname, '../dist/js/**/*')
+            ],
+            verbose: true
+        })
     ] as Plugin[],
 
-    optimization: {
+    optimization: (cacheGroups?: { [key: string]: Options.CacheGroupsOptions }): Options.Optimization => ({
         splitChunks: {
             cacheGroups: {
                 vendors: {
                     test: /[\\/]node_modules[\\/]/i,
                     name: 'vendors',
                     chunks: 'all'
-                }
+                },
+                ...cacheGroups || {}
             }
         },
         runtimeChunk: {
             name: 'vendors'
         }
-    } as Options.Optimization
+    })
 })

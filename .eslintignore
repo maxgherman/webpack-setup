@@ -1,1 +1,4 @@
 webpack
+postcss.config.js
+**/*.module.css.d.ts
+**/*.module.pcss.d.ts

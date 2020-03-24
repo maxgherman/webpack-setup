@@ -1,4 +1,5 @@
 import webpack, { Configuration } from 'webpack'
+import MiniCssExtractPlugin from 'mini-css-extract-plugin'
 import Environments from './environments.js'
 import { getParts } from './parts'
 
@@ -19,7 +20,45 @@ const config: Configuration = {
 
     resolve: parts.resolve,
 
-    module: parts.module,
+    module: {
+        rules: [
+            ...parts.rules,
+            {
+                test: /\.css$/,
+                exclude: /\.module\.css$/,
+                use: [MiniCssExtractPlugin.loader, 'css-loader']
+            },
+            {
+                test: /\.pcss$/,
+                exclude: /\.module\.pcss$/,
+                use: [MiniCssExtractPlugin.loader, 'css-loader', 'postcss-loader']
+            },
+            {
+                test: /\.module\.css$/,
+                use: [
+                    MiniCssExtractPlugin.loader,
+                    'css-modules-typescript-loader',
+                    {
+                        loader: 'css-loader',
+                        options: {
+                            modules: true,
+                        }
+                    }
+                ]
+            },
+            {
+                test: /\.module\.pcss$/,
+                use: [
+                    MiniCssExtractPlugin.loader,
+                    'css-modules-typescript-loader',
+                    {
+                        loader: 'css-loader', options: { modules: true, importLoaders: 1 }
+                    },
+                    'postcss-loader'
+                ]
+            }
+        ]
+    },
 
     node: parts.node,
 
@@ -29,11 +68,24 @@ const config: Configuration = {
         new webpack.SourceMapDevToolPlugin({
             filename: '[name].js.map',
             lineToLine: true
-        })
+        }),
+
+        new MiniCssExtractPlugin({
+            filename: '../css/[name].css',
+            chunkFilename: '../css/[name].css',
+        }),
     ],
 
     optimization: {
-        ...parts.optimization,
+        ...parts.optimization({
+            styles: {
+                name: 'styles',
+                test: /\.css$/,
+                chunks: 'initial',
+                enforce: true,
+                minSize: Infinity
+              }
+        }),
 
         minimize: true,
         removeAvailableModules: true,

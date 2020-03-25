@@ -1,7 +1,9 @@
 import webpack, { Configuration } from 'webpack'
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
+import HtmlWebpackPlugin from 'html-webpack-plugin';
+import CopyPlugin from 'copy-webpack-plugin'
 import Environments from './environments.js'
-import { getParts } from './parts'
+import { getParts, folders } from './parts'
 
 const environments = Environments()
 console.log(`Running webpack config for environment: ${environments.current}`)
@@ -63,7 +65,15 @@ const config: Configuration = {
     node: parts.node,
 
     plugins: [
-        ...parts.plugins,
+        ...parts.plugins.concat([
+                new HtmlWebpackPlugin({
+                chunksSortMode: 'auto',
+                filename: '../index.html',
+                template: '../webpack/index.html',
+                alwaysWriteToDisk: true,
+                minify: false
+            }),
+        ]),
 
         new webpack.SourceMapDevToolPlugin({
             filename: '../js/[name].js.map',
@@ -73,6 +83,14 @@ const config: Configuration = {
             filename: '../css/[name].css',
             chunkFilename: '../css/[name].css',
         }),
+        new CopyPlugin([{
+            from: '../assets/favicons',
+            to: folders.dist()
+        },
+        {
+            from: '../assets/favicons/manifest.json',
+            to:folders.dist()
+        }])
     ],
 
     optimization: {

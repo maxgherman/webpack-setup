@@ -1,4 +1,5 @@
 webpack
+favicon-generator
 postcss.config.js
 **/*.module.css.d.ts
 **/*.module.pcss.d.ts

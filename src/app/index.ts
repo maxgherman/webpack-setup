@@ -9,7 +9,7 @@ import smallLogo from '@img/logo2.jpg'
 type DynamicImport = Promise<{ default: () => string }>
 
 function* func (): Generator<string | DynamicImport, void, string> {
-    const result = yield toCapital('test 1')
+    const result = yield toCapital('test')
     yield toCapital(result)
 
     yield import(/* webpackChunkName: "feature" */ './feature/index')
@@ -32,7 +32,7 @@ export const render = (): void => {
 
     const interval = setInterval((): void => {
         count++
-        const next = f.next('hello world')
+        const next = f.next('hello world 1')
 
         if(next.done) {
             clearInterval(interval)

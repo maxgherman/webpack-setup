@@ -1,6 +1,7 @@
 import { Configuration } from 'webpack'
+import HtmlWebpackPlugin from 'html-webpack-plugin';
 import Environments from './environments.js'
-import { getParts, distFolder } from './parts'
+import { getParts, folders } from './parts'
 
 const environments = Environments()
 console.log(`Running webpack config for environment: ${environments.current}`)
@@ -63,15 +64,23 @@ const config: Configuration = {
 
     node: parts.node,
 
-    plugins: parts.plugins,
+    plugins: parts.plugins.concat([
+        new HtmlWebpackPlugin({
+            chunksSortMode: 'auto',
+            filename: '../index.html',
+            alwaysWriteToDisk: true,
+            minify: false
+        })
+    ]),
 
     optimization: parts.optimization(),
 
     devServer: {
-        contentBase: distFolder(),
+        contentBase: folders.dist(),
         overlay: true,
         hot: true,
-        open: true
+        open: true,
+        writeToDisk: true
     }
 }
 

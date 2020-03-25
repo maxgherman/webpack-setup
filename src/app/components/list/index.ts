@@ -1,6 +1,6 @@
 import * as styles from './index.style'
-import cssStyles from './index.module.css'
-import pcssStyles from './index.module.pcss'
+import* as cssStyles from './index.module.css'
+import * as pcssStyles from './index.module.pcss'
 
 import { appendToBody} from '@utils'
 

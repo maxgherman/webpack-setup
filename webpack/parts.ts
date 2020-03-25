@@ -1,10 +1,11 @@
 import path from 'path'
 import webpack, { Entry, Output, Node, Resolve, Plugin, RuleSetRule, Options } from 'webpack'
-import HtmlWebpackPlugin from 'html-webpack-plugin';
-import HtmlWebpackHarddiskPlugin from 'html-webpack-harddisk-plugin';
 import { CleanWebpackPlugin } from 'clean-webpack-plugin'
 
-export const distFolder = () => path.resolve(__dirname, '../dist')
+export const folders = {
+    dist: () => path.resolve(__dirname, '../dist'),
+    distJs: () => path.resolve(__dirname, '../dist/js')
+}
 
 export const getParts = () => ({
     context: path.join(__dirname, '../src'),
@@ -15,7 +16,7 @@ export const getParts = () => ({
     } as Entry,
 
     output: {
-        path: path.resolve(distFolder(), 'js'),
+        path: folders.distJs(),
         filename: '[name].bundle.js',
         publicPath: '/js/'
     } as Output,
@@ -40,6 +41,7 @@ export const getParts = () => ({
     },
     {
         test: /\.(png|jpg|gif|bmp)$/,
+        exclude: /favicons/,
         use: [
         {
             loader: 'url-loader',
@@ -48,20 +50,17 @@ export const getParts = () => ({
                 name: '../img/[name].[ext]',
             }
         }]
+    },
+    {
+        test: /favicons\/.*\.(ico|png)$/,
+        loader: 'file-loader?name=../[name].[ext]'
     }] as RuleSetRule[] ,
 
     plugins: [
         new webpack.EnvironmentPlugin(['NODE_ENV']),
-        new HtmlWebpackPlugin({
-            chunksSortMode: 'auto',
-            filename: '../index.html',
-            alwaysWriteToDisk: true
-        }),
-        new HtmlWebpackHarddiskPlugin(),
         new CleanWebpackPlugin({
             cleanOnceBeforeBuildPatterns: [
-                path.resolve(__dirname, '../dist/css/**/*'),
-                path.resolve(__dirname, '../dist/js/**/*'),
+                `${folders.dist()}/**/*`
             ],
             verbose: true
         })

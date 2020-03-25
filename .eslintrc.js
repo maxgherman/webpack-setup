@@ -18,6 +18,19 @@ module.exports =  {
 
     rules:  {
         semi: ["error", "never"],
-        "linebreak-style": ["error", "unix"]
+        "@typescript-eslint/prefer-interface": ["off"],
+        "@typescript-eslint/member-delimiter-style": [
+            "error",
+            {
+                "multiline": {
+                    "delimiter": "none",
+                    "requireLast": false
+                },
+                "singleline": {
+                    "delimiter": "semi",
+                    "requireLast": false
+                }
+            }
+        ]
     }
 };

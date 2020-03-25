@@ -24,7 +24,9 @@ module.exports = api => {
                 root: ["."],
                 alias: {
                     "@app": "./src/app",
-                    "@utils": "./src/utils"
+                    "@components": "./src/app/components",
+                    "@utils": "./src/utils",
+                    "@img": "./assets/images"
                 }
             }],
         ]

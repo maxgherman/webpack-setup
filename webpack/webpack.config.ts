@@ -66,8 +66,7 @@ const config: Configuration = {
         ...parts.plugins,
 
         new webpack.SourceMapDevToolPlugin({
-            filename: '[name].js.map',
-            lineToLine: true
+            filename: '../js/[name].js.map',
         }),
 
         new MiniCssExtractPlugin({

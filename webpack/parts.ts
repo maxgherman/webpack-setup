@@ -37,6 +37,17 @@ export const getParts = () => ({
             /node_modules/,
         ],
         loader: 'babel-loader',
+    },
+    {
+        test: /\.(png|jpg|gif|bmp)$/,
+        use: [
+        {
+            loader: 'url-loader',
+            options: {
+                limit: 10000,
+                name: '../img/[name].[ext]',
+            }
+        }]
     }] as RuleSetRule[] ,
 
     plugins: [
@@ -50,7 +61,7 @@ export const getParts = () => ({
         new CleanWebpackPlugin({
             cleanOnceBeforeBuildPatterns: [
                 path.resolve(__dirname, '../dist/css/**/*'),
-                path.resolve(__dirname, '../dist/js/**/*')
+                path.resolve(__dirname, '../dist/js/**/*'),
             ],
             verbose: true
         })

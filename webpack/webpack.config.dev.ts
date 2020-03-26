@@ -1,5 +1,7 @@
+import path from 'path'
 import { Configuration } from 'webpack'
 import HtmlWebpackPlugin from 'html-webpack-plugin';
+import CopyPlugin from 'copy-webpack-plugin'
 import Environments from './environments.js'
 import { getParts, folders } from './parts'
 
@@ -64,14 +66,20 @@ const config: Configuration = {
 
     node: parts.node,
 
-    plugins: parts.plugins.concat([
+    plugins: [
+        ...parts.plugins,
         new HtmlWebpackPlugin({
             chunksSortMode: 'auto',
-            filename: '../index.html',
+            filename: 'index.html',
+            favicon: '../assets/favicons/favicon.ico',
             alwaysWriteToDisk: true,
             minify: false
-        })
-    ]),
+        }),
+        new CopyPlugin([{
+            from: '../assets/fonts/**/*',
+            to: path.resolve(folders.dist(), 'assets')
+        }])
+    ],
 
     optimization: parts.optimization(),
 

@@ -4,7 +4,6 @@ import { CleanWebpackPlugin } from 'clean-webpack-plugin'
 
 export const folders = {
     dist: () => path.resolve(__dirname, '../dist'),
-    distJs: () => path.resolve(__dirname, '../dist/js')
 }
 
 export const getParts = () => ({
@@ -16,9 +15,9 @@ export const getParts = () => ({
     } as Entry,
 
     output: {
-        path: folders.distJs(),
+        path: folders.dist(),
         filename: '[name].bundle.js',
-        publicPath: '/js/'
+        publicPath: '/'
     } as Output,
 
     node: {
@@ -47,13 +46,9 @@ export const getParts = () => ({
             loader: 'url-loader',
             options: {
                 limit: 10000,
-                name: '../img/[name].[ext]',
+                name: './img/[name].[ext]',
             }
         }]
-    },
-    {
-        test: /favicons\/.*\.(ico|png)$/,
-        loader: 'file-loader?name=../[name].[ext]'
     }] as RuleSetRule[] ,
 
     plugins: [

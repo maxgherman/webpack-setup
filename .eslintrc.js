@@ -31,6 +31,7 @@ module.exports =  {
                     "requireLast": false
                 }
             }
-        ]
+        ],
+        "linebreak-style": ["error", "unix"]
     }
 };

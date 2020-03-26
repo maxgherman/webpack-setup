@@ -1,4 +1,4 @@
-import webpack, { Configuration } from 'webpack'
+import { Configuration } from 'webpack'
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import CopyPlugin from 'copy-webpack-plugin'
@@ -19,6 +19,8 @@ const config: Configuration = {
     entry: parts.entry,
 
     output: parts.output,
+
+    devtool: 'source-map',
 
     resolve: parts.resolve,
 
@@ -58,6 +60,15 @@ const config: Configuration = {
                     },
                     'postcss-loader'
                 ]
+            },
+            {
+                test: /\.(woff|woff2)$/,
+                use: [{
+                    loader: 'file-loader',
+                    options: {
+                        name: './fonts/[name].[ext]'
+                    }
+                }]
             }
         ]
     },
@@ -65,23 +76,17 @@ const config: Configuration = {
     node: parts.node,
 
     plugins: [
-        ...parts.plugins.concat([
-                new HtmlWebpackPlugin({
-                chunksSortMode: 'auto',
-                filename: '../index.html',
-                template: '../webpack/index.html',
-                alwaysWriteToDisk: true,
-                minify: false
-            }),
-        ]),
-
-        new webpack.SourceMapDevToolPlugin({
-            filename: '../js/[name].js.map',
+        ...parts.plugins,
+        new HtmlWebpackPlugin({
+            chunksSortMode: 'auto',
+            filename: './index.html',
+            template: '../webpack/index.html',
+            alwaysWriteToDisk: true,
+            minify: false
         }),
-
         new MiniCssExtractPlugin({
-            filename: '../css/[name].css',
-            chunkFilename: '../css/[name].css',
+            filename: 'css/[name].css',
+            chunkFilename: 'css/[name].css',
         }),
         new CopyPlugin([{
             from: '../assets/favicons',

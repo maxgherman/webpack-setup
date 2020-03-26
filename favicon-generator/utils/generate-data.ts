@@ -16,18 +16,23 @@ export const generate = async () => {
         return aValue < bValue ? 1 : (aValue > bValue ? -1 : 0)
     })
 
-    data.html = data.html
-    .map((item) => {
-        const matches = item.match(/href.*=.*"(?<value>.*?)"/)
+    data.html = data.html.reduce((acc, curr) => {
 
-        if(!matches || !matches.groups || !matches.groups['value'] ||
-            matches.groups['value'].endsWith('.json')) {
-            return item
+        const matches = curr.match(/href.*=.*"(?<value>.*?)"/)
+
+        if(!matches || !matches.groups || !matches.groups['value']) {
+            return acc.concat(curr)
+        }
+
+        // exclude manifest.json
+        if(matches.groups['value'].endsWith('manifest.json')) {
+            return acc
         }
 
         const replacement = `href="${matches.groups['value']}"`;
-        return item.replace(/href.*=.*".*"/, replacement)
-    })
+        return acc.concat(curr.replace(/href.*=.*".*"/, replacement))
+
+    }, [] as string[]);
 
     return data
 }

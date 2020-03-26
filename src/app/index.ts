@@ -1,36 +1,31 @@
 import './index.pcss'
 import { list as createList } from '@components/list'
 import { image as createImage } from '@components/image'
-import { toCapital } from '@utils'
+import { toCapital, createFrame } from '@utils'
 
-import largeLogo from '@img/logo1.png'
-import smallLogo from '@img/logo2.jpg'
+import largeLogo from '@img/logo.png'
 
 type DynamicImport = Promise<{ default: () => string }>
 
-function* func (): Generator<string | DynamicImport, void, string> {
-    const result = yield toCapital('test')
-    yield toCapital(result)
+function* func (): Generator<string| DynamicImport, void, string> {
+    yield 'hello world'
     yield import(/* webpackChunkName: "feature" */ './feature/index')
 }
+
+const frame = createFrame()
 
 export const render = (): void => {
 
     const f = func()
-    let count = 0
-
-    const list = createList()
-    list.render()
 
     const largeImage = createImage(largeLogo, 'large')
-    largeImage.render()
+    largeImage.render(frame)
 
-    const smallImage = createImage(smallLogo, 'small')
-    smallImage.render()
+    const list = createList()
+    list.render(frame)
 
     const interval = setInterval((): void => {
-        count++
-        const next = f.next('hello world')
+        const next = f.next()
 
         if(next.done) {
             clearInterval(interval)
@@ -41,11 +36,10 @@ export const render = (): void => {
             next.value instanceof Promise) {
             (next.value as DynamicImport)
                 .then((data): void => {
-                    list.addItem(data.default(), 'regular')
+                    list.addItem(toCapital(data.default()))
                 })
         } else {
-            const itemType = count % 2 == 0 ? 'highlight' : 'regular'
-            list.addItem(next.value, itemType)
+            list.addItem(toCapital(next.value))
         }
     }, 1000)
 }

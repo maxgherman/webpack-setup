@@ -1,6 +1,6 @@
 
 export const configuration = {
-    source: '../assets/images/logo1.png',
+    source: '../assets/images/logo.png',
     destination: '../assets/favicons',
     html: {
         source: '../webpack/index.html',
@@ -12,8 +12,8 @@ export const configuration = {
 
     favicons: {
         path: "/",                                // Path for overriding default icons path. `string`
-        appName: 'Webpack App',                   // Your application's name. `string`
-        appShortName: 'Webpack App',              // Your application's short_name. `string`. Optional. If not set, appName will be used
+        appName: 'Webpack setup',                 // Your application's name. `string`
+        appShortName: 'Webpack setup',            // Your application's short_name. `string`. Optional. If not set, appName will be used
         appDescription: null,                     // Your application's description. `string`
         developerName: null,                      // Your (or your developer's) name. `string`
         developerURL: null,                       // Your (or your developer's) URL. `string`

@@ -4,14 +4,18 @@ import { CleanWebpackPlugin } from 'clean-webpack-plugin'
 
 export const folders = {
     dist: () => path.resolve(__dirname, '../dist'),
+    assets: {
+        fonts: '../assets/fonts',
+        favicons: '../assets/favicons',
+        faviconsManifest: '../assets/favicons/manifest.json'
+    }
 }
 
 export const getParts = () => ({
     context: path.join(__dirname, '../src'),
 
     entry: {
-        main: './index',
-        utils: './utils/index'
+        main: './index'
     } as Entry,
 
     output: {
@@ -28,28 +32,31 @@ export const getParts = () => ({
         extensions: ['.ts', '.js', '.json']
     } as Resolve,
 
+    rules: {
+        babel: {
+            // Include ts/js files.
+            test: /\.(ts)|(js)$/,
 
-    rules: [{
-        // Include ts/js files.
-        test: /\.(ts)|(js)$/,
+            exclude: [ // https://github.com/webpack/webpack/issues/6544
+                /node_modules/,
+            ],
+            loader: 'babel-loader',
+        },
 
-        exclude: [ // https://github.com/webpack/webpack/issues/6544
-            /node_modules/,
-        ],
-        loader: 'babel-loader',
+        images: (name?: string) => ({
+                test: /\.(png|jpg|gif|bmp)$/,
+                exclude: /favicons/,
+                use: [
+                {
+                    loader: 'url-loader',
+                    options: {
+                        limit: 10000,
+                        name: './img/[name].[ext]',
+                        ...(name ? { name } : {})
+                    }
+                }]
+        }) as RuleSetRule
     },
-    {
-        test: /\.(png|jpg|gif|bmp)$/,
-        exclude: /favicons/,
-        use: [
-        {
-            loader: 'url-loader',
-            options: {
-                limit: 10000,
-                name: './img/[name].[ext]',
-            }
-        }]
-    }] as RuleSetRule[] ,
 
     plugins: [
         new webpack.EnvironmentPlugin(['NODE_ENV']),
@@ -61,7 +68,7 @@ export const getParts = () => ({
         })
     ] as Plugin[],
 
-    optimization: (cacheGroups?: { [key: string]: Options.CacheGroupsOptions }): Options.Optimization => ({
+    optimization: {
         splitChunks: {
             cacheGroups: {
                 vendors: {
@@ -69,11 +76,10 @@ export const getParts = () => ({
                     name: 'vendors',
                     chunks: 'all'
                 },
-                ...cacheGroups || {}
             }
         },
         runtimeChunk: {
             name: 'vendors'
         }
-    })
+    } as Options.Optimization
 })

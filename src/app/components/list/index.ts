@@ -1,48 +1,33 @@
-import * as styles from './index.style'
-import cssStyles from './index.module.css'
-import pcssStyles from './index.module.pcss'
+import { append } from '@utils'
 
-import { appendToBody} from '@utils'
-
-const createList = (className: string): HTMLUListElement => {
+const createList = (): HTMLUListElement => {
     const list = document.createElement('ul')
-    list.className = className
+    list.className = 'list'
     return list
 }
 
-export const appendListItem = (list: HTMLUListElement, className: string, text: string): void => {
+export const appendListItem = (list: HTMLUListElement, text: string): void => {
     const item = document.createElement('li')
     item.innerText = text
-    item.className = className
     list.appendChild(item)
 }
 
 export type List = {
-    addItem: (text: string, itemType: ListItemType) => void
+    addItem: (text: string) => void
     render(parent?: HTMLElement): void
 }
 
-export type ListItemType = 'regular' | 'highlight'
-
 export const list = (): List => {
 
-    const result = createList(styles.list)
+    const result = createList()
 
     return {
-        addItem(text: string, itemType: ListItemType): void {
-
-            const className = itemType === 'regular' ?
-                cssStyles["item-regular"] : pcssStyles["item-highlight"]
-
-            appendListItem(result, className, text)
+        addItem(text: string): void {
+            appendListItem(result, text)
         },
 
-        render(parent?: HTMLElement): void {
-            if(parent) {
-                parent.appendChild(result)
-            } else {
-                appendToBody(result)
-            }
+        render(parent: HTMLElement): void {
+            append(parent, result)
         }
     }
 }

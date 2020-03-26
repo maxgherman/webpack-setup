@@ -2,6 +2,7 @@ import path from 'path'
 import { Configuration } from 'webpack'
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import CopyPlugin from 'copy-webpack-plugin'
+import ManifestPlugin from 'webpack-manifest-plugin'
 import Environments from './environments.js'
 import { getParts, folders } from './parts'
 
@@ -26,40 +27,15 @@ const config: Configuration = {
 
     module: {
         rules: [
-            ...parts.rules,
+            parts.rules.babel,
+            parts.rules.images(),
             {
                 test: /\.css$/,
-                exclude: /\.module\.css$/,
                 use: ['style-loader', 'css-loader']
             },
             {
                 test: /\.pcss$/,
-                exclude: /\.module\.pcss$/,
                 use: ['style-loader', 'postcss-loader']
-            },
-            {
-                test: /\.module\.css$/,
-                use: [
-                    'style-loader',
-                    'css-modules-typescript-loader',
-                    {
-                        loader: 'css-loader',
-                        options: {
-                            modules: true,
-                        }
-                    }
-                ]
-            },
-            {
-                test: /\.module\.pcss$/,
-                use: [
-                    'style-loader',
-                    'css-modules-typescript-loader',
-                    {
-                        loader: 'css-loader', options: { modules: true, importLoaders: 1 }
-                    },
-                    'postcss-loader'
-                ]
             }
         ]
     },
@@ -76,12 +52,13 @@ const config: Configuration = {
             minify: false
         }),
         new CopyPlugin([{
-            from: '../assets/fonts/**/*',
+            from:  `${folders.assets.fonts}/**/*`,
             to: path.resolve(folders.dist(), 'assets')
-        }])
+        }]),
+       new ManifestPlugin()
     ],
 
-    optimization: parts.optimization(),
+    optimization: parts.optimization,
 
     devServer: {
         contentBase: folders.dist(),

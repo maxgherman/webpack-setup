@@ -1,3 +1,1 @@
-import './index.pcss'
-
-export default (): string => 'feature'
+export default (): string => 'webpack'

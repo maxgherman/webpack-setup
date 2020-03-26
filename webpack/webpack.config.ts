@@ -1,9 +1,13 @@
 import { Configuration } from 'webpack'
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
+import ManifestPlugin from 'webpack-manifest-plugin'
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import CopyPlugin from 'copy-webpack-plugin'
 import Environments from './environments.js'
 import { getParts, folders } from './parts'
+import { requireManifest, generatePlain, generateFromManifest } from './manifest'
+
+const readManifest = requireManifest(folders.assets.faviconsManifest)
 
 const environments = Environments()
 console.log(`Running webpack config for environment: ${environments.current}`)
@@ -18,7 +22,10 @@ const config: Configuration = {
 
     entry: parts.entry,
 
-    output: parts.output,
+    output: {
+        ...parts.output,
+        filename: '[name].bundle.[contenthash:8].js',
+    },
 
     devtool: 'source-map',
 
@@ -26,47 +33,22 @@ const config: Configuration = {
 
     module: {
         rules: [
-            ...parts.rules,
+            parts.rules.babel,
+            parts.rules.images('./img/[name].[contenthash:8].[ext]'),
             {
                 test: /\.css$/,
-                exclude: /\.module\.css$/,
                 use: [MiniCssExtractPlugin.loader, 'css-loader']
             },
             {
                 test: /\.pcss$/,
-                exclude: /\.module\.pcss$/,
                 use: [MiniCssExtractPlugin.loader, 'css-loader', 'postcss-loader']
-            },
-            {
-                test: /\.module\.css$/,
-                use: [
-                    MiniCssExtractPlugin.loader,
-                    'css-modules-typescript-loader',
-                    {
-                        loader: 'css-loader',
-                        options: {
-                            modules: true,
-                        }
-                    }
-                ]
-            },
-            {
-                test: /\.module\.pcss$/,
-                use: [
-                    MiniCssExtractPlugin.loader,
-                    'css-modules-typescript-loader',
-                    {
-                        loader: 'css-loader', options: { modules: true, importLoaders: 1 }
-                    },
-                    'postcss-loader'
-                ]
             },
             {
                 test: /\.(woff|woff2)$/,
                 use: [{
                     loader: 'file-loader',
                     options: {
-                        name: './fonts/[name].[ext]'
+                        name: './fonts/[name].[contenthash:8].[ext]'
                     }
                 }]
             }
@@ -85,30 +67,27 @@ const config: Configuration = {
             minify: false
         }),
         new MiniCssExtractPlugin({
-            filename: 'css/[name].css',
-            chunkFilename: 'css/[name].css',
+            filename: 'css/[name].[contenthash:8].css',
+            chunkFilename: 'css/[name].[contenthash:8].css',
         }),
+
+        new ManifestPlugin({
+            generate: (_, files) =>
+                readManifest.result ?
+                    generateFromManifest(readManifest.manifest!, files) :
+                    generatePlain(files)
+        }),
+
         new CopyPlugin([{
-            from: '../assets/favicons',
+            from: folders.assets.favicons,
             to: folders.dist()
-        },
-        {
-            from: '../assets/favicons/manifest.json',
-            to:folders.dist()
         }])
     ],
 
     optimization: {
-        ...parts.optimization({
-            styles: {
-                name: 'styles',
-                test: /\.css$/,
-                chunks: 'initial',
-                enforce: true,
-                minSize: Infinity
-              }
-        }),
+        ...parts.optimization,
 
+        moduleIds: 'hashed',
         minimize: true,
         removeAvailableModules: true,
     }

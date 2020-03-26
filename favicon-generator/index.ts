@@ -4,9 +4,13 @@ import { save } from './utils/save-data'
 
 const run = async () => {
 
-    const data = await generate()
-    await deleteFiles()
-    await save(data)
+    try {
+        const data = await generate()
+        await deleteFiles()
+        await save(data)
+    } catch(error) {
+        console.log(error)
+    }
 }
 
 run()

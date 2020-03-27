@@ -32,15 +32,17 @@ export const getParts = () => ({
         extensions: ['.ts', '.js', '.json']
     } as Resolve,
 
+
     rules: {
         babel: {
             // Include ts/js files.
             test: /\.(ts)|(js)$/,
 
-            exclude: [ // https://github.com/webpack/webpack/issues/6544
-                /node_modules/,
-            ],
+            exclude: [ /node_modules/ ],
             loader: 'babel-loader',
+            options: {
+                cacheDirectory: true
+            }
         },
 
         images: (name?: string) => ({
@@ -66,20 +68,5 @@ export const getParts = () => ({
             ],
             verbose: true
         })
-    ] as Plugin[],
-
-    optimization: {
-        splitChunks: {
-            cacheGroups: {
-                vendors: {
-                    test: /[\\/]node_modules[\\/]/i,
-                    name: 'vendors',
-                    chunks: 'all'
-                },
-            }
-        },
-        runtimeChunk: {
-            name: 'vendors'
-        }
-    } as Options.Optimization
+    ] as Plugin[]
 })

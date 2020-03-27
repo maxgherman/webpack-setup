@@ -3,6 +3,7 @@ import MiniCssExtractPlugin from 'mini-css-extract-plugin'
 import ManifestPlugin from 'webpack-manifest-plugin'
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import CopyPlugin from 'copy-webpack-plugin'
+import TerserPlugin from 'terser-webpack-plugin'
 import Environments from './environments.js'
 import { getParts, folders } from './parts'
 import { requireManifest, generatePlain, generateFromManifest } from './manifest'
@@ -37,11 +38,13 @@ const config: Configuration = {
             parts.rules.images('./img/[name].[contenthash:8].[ext]'),
             {
                 test: /\.css$/,
-                use: [MiniCssExtractPlugin.loader, 'css-loader']
+                use: [MiniCssExtractPlugin.loader, 'css-loader'],
+                sideEffects: true
             },
             {
                 test: /\.pcss$/,
-                use: [MiniCssExtractPlugin.loader, 'css-loader', 'postcss-loader']
+                use: [MiniCssExtractPlugin.loader, 'css-loader', 'postcss-loader'],
+                sideEffects: true
             },
             {
                 test: /\.(woff|woff2)$/,
@@ -85,11 +88,52 @@ const config: Configuration = {
     ],
 
     optimization: {
-        ...parts.optimization,
-
         moduleIds: 'hashed',
         minimize: true,
         removeAvailableModules: true,
+        usedExports: true,
+
+        runtimeChunk: 'single',
+        splitChunks: {
+            chunks: 'all',
+            maxInitialRequests: Infinity,
+            minSize: 0,
+            cacheGroups: {
+                vendors: {
+                    test: /[\\/]node_modules[\\/]/i,
+                    name(module) {
+                        const packageName =
+                            module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)[1];
+
+                        return `vendor.${packageName.replace('@', '')}`;
+                    }
+                }
+            }
+        },
+
+        minimizer: [
+            new TerserPlugin({
+                terserOptions: {
+                  compress: {
+                    comparisons: false,
+                    ecma: 5,
+                    inline: true,
+                    warnings: false,
+                  },
+                  keep_classnames: true,
+                  keep_fnames: true,
+                  parse: {
+                    ecma: 8,
+                  },
+                  output: {
+                    ascii_only: true,
+                    ecma: 5,
+                    comments: false,
+                  },
+                },
+                sourceMap: true,
+              })
+        ]
     }
 }
 

@@ -58,7 +58,20 @@ const config: Configuration = {
        new ManifestPlugin()
     ],
 
-    optimization: parts.optimization,
+    optimization: {
+        splitChunks: {
+            cacheGroups: {
+                vendors: {
+                    test: /[\\/]node_modules[\\/]/i,
+                    name: 'vendors',
+                    chunks: 'all'
+                },
+            }
+        },
+        runtimeChunk: {
+            name: 'vendors'
+        }
+    },
 
     devServer: {
         contentBase: folders.dist(),

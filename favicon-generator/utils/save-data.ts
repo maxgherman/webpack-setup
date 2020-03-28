@@ -1,26 +1,25 @@
 import util from 'util'
 import path from 'path'
 import fs from 'fs'
-import { Result } from './common'
-import { configuration } from '../config'
+import { Result, Config } from './common'
 
 const writeFile = util.promisify(fs.writeFile)
 const readFile = util.promisify(fs.readFile)
 
-export const save = async (data: Result) => {
+export const save = async (config: Config, data: Result): Promise<void> => {
 
-    const { marker} = configuration.html
+    const { marker} = config.html
     const markerRegex = new RegExp(`${marker.start}[\\s\\S]*${marker.end}`)
 
     const actions = data.images.map(item =>
-        writeFile(path.resolve(configuration.destination, item.name), item.contents)
+        writeFile(path.resolve(config.destination, item.name), item.contents)
     )
     .concat(
         data.files.map((item) =>
-            writeFile(path.resolve(configuration.destination, item.name), item.contents))
+            writeFile(path.resolve(config.destination, item.name), item.contents))
     )
     .concat(
-        readFile(configuration.html.source, 'utf8')
+        readFile(config.html.source, 'utf8')
         .then((html) =>
             html.replace(
                 markerRegex,
@@ -28,7 +27,7 @@ export const save = async (data: Result) => {
             )
         )
         .then((html) =>
-            writeFile(configuration.html.source, html)
+            writeFile(config.html.source, html)
         )
     )
 

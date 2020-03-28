@@ -1,2 +1,4 @@
 node_modules
 dist
+analysis/lighthouse/*
+!analysis/lighthouse/.gitkeep

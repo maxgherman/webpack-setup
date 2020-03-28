@@ -4,15 +4,10 @@ import ManifestPlugin from 'webpack-manifest-plugin'
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import CopyPlugin from 'copy-webpack-plugin'
 import TerserPlugin from 'terser-webpack-plugin'
-import Environments from './environments.js'
 import { getParts, folders } from './parts'
 import { requireManifest, generatePlain, generateFromManifest } from './manifest'
 
 const readManifest = requireManifest(folders.assets.faviconsManifest)
-
-const environments = Environments()
-console.log(`Running webpack config for environment: ${environments.current}`)
-
 const parts = getParts()
 
 const config: Configuration = {
@@ -25,7 +20,7 @@ const config: Configuration = {
 
     output: {
         ...parts.output,
-        filename: '[name].bundle.[contenthash:8].js',
+        filename: '[name].[contenthash:8].js',
     },
 
     devtool: 'source-map',
@@ -35,7 +30,7 @@ const config: Configuration = {
     module: {
         rules: [
             parts.rules.babel,
-            parts.rules.images('./img/[name].[contenthash:8].[ext]'),
+            parts.rules.images('img/[name].[contenthash:8].[ext]'),
             {
                 test: /\.css$/,
                 use: [MiniCssExtractPlugin.loader, 'css-loader'],
@@ -46,26 +41,18 @@ const config: Configuration = {
                 use: [MiniCssExtractPlugin.loader, 'css-loader', 'postcss-loader'],
                 sideEffects: true
             },
-            {
-                test: /\.(woff|woff2)$/,
-                use: [{
-                    loader: 'file-loader',
-                    options: {
-                        name: './fonts/[name].[contenthash:8].[ext]'
-                    }
-                }]
-            }
+            parts.rules.fonts('fonts/[name].[contenthash:8].[ext]')
         ]
     },
 
     node: parts.node,
 
     plugins: [
-        ...parts.plugins,
+        ...parts.plugins(),
         new HtmlWebpackPlugin({
             chunksSortMode: 'auto',
             filename: './index.html',
-            template: '../webpack/index.html',
+            template: './webpack/index.html',
             alwaysWriteToDisk: true,
             minify: false
         }),
@@ -75,6 +62,7 @@ const config: Configuration = {
         }),
 
         new ManifestPlugin({
+            fileName: 'asset-manifest.json',
             generate: (_, files) =>
                 readManifest.result ?
                     generateFromManifest(readManifest.manifest!, files) :
@@ -84,14 +72,19 @@ const config: Configuration = {
         new CopyPlugin([{
             from: folders.assets.favicons,
             to: folders.dist()
-        }])
+        }]),
     ],
+
+    performance: {
+        hints: 'error'
+    },
 
     optimization: {
         moduleIds: 'hashed',
         minimize: true,
         removeAvailableModules: true,
         usedExports: true,
+        concatenateModules: true,
 
         runtimeChunk: 'single',
         splitChunks: {
@@ -101,9 +94,15 @@ const config: Configuration = {
             cacheGroups: {
                 vendors: {
                     test: /[\\/]node_modules[\\/]/i,
-                    name(module) {
+                    name(module: { context: string }) {
                         const packageName =
-                            module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)[1];
+                            module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)![1]
+                            .toLowerCase();
+
+                        if(packageName.startsWith('core-js') ||
+                            packageName.startsWith('babel')) {
+                            return 'vendor.babel'
+                        }
 
                         return `vendor.${packageName.replace('@', '')}`;
                     }

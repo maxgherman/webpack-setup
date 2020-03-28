@@ -3,7 +3,7 @@ import { list as createList } from '@components/list'
 import { image as createImage } from '@components/image'
 import { toCapital, createFrame } from '@utils'
 
-import largeLogo from '@img/logo.png'
+import logo from '@img/logo.jpg'
 
 type DynamicImport = Promise<{ default: () => string }>
 
@@ -18,7 +18,7 @@ export const render = (): void => {
 
     const f = func()
 
-    const largeImage = createImage(largeLogo, 'large')
+    const largeImage = createImage(logo, 'large')
     largeImage.render(frame)
 
     const list = createList()

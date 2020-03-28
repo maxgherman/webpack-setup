@@ -1,0 +1,35 @@
+[{
+    "name": "app",
+    "path": [
+        "../app/dist/*.js",
+        "../app/dist/*.json",
+        "!../app/dist/stats.json",
+        "!../app/dist/vendor.*",
+        "!../app/dist/runtime.*"
+    ],
+    "running": false
+},
+{
+    "name": "webpack",
+    "path": [
+        "../app/dist/vendor.webpack*.js"
+    ],
+    "running": false
+},
+{
+    "name": "vendor",
+    "path": [
+        "../app/dist/vendor.*.js",
+        "../app/dist/runtime*.js"
+    ],
+    "running": false
+},
+{
+    "name": "all",
+    "path": [
+        "../app/dist/*.js",
+        "../app/dist/*.json",
+        "!../app/dist/stats.json"
+    ],
+    "running": false
+}]

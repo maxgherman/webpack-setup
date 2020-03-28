@@ -5,22 +5,22 @@ import { CleanWebpackPlugin } from 'clean-webpack-plugin'
 export const folders = {
     dist: () => path.resolve(__dirname, '../dist'),
     assets: {
-        fonts: '../assets/fonts',
-        favicons: '../assets/favicons',
-        faviconsManifest: '../assets/favicons/manifest.json'
+        favicon: './assets/favicons/favicon.ico',
+        favicons: './assets/favicons',
+        faviconsManifest: path.resolve('./assets/favicons/manifest.json')
     }
 }
 
 export const getParts = () => ({
-    context: path.join(__dirname, '../src'),
+    context: path.join(__dirname, '../.'),
 
     entry: {
-        main: './index'
+        main: './src/index'
     } as Entry,
 
     output: {
         path: folders.dist(),
-        filename: '[name].bundle.js',
+        filename: '[name].js',
         publicPath: '/'
     } as Output,
 
@@ -52,21 +52,34 @@ export const getParts = () => ({
                 {
                     loader: 'url-loader',
                     options: {
+                        esModule: false,
                         limit: 10000,
-                        name: './img/[name].[ext]',
+                        name: 'img/[name].[ext]',
                         ...(name ? { name } : {})
                     }
                 }]
+        }) as RuleSetRule,
+
+        fonts: (name?: string) => ({
+            test: /\.(woff|woff2)$/,
+            use: [{
+                loader: 'file-loader',
+                options: {
+                    name: 'fonts/[name].[ext]',
+                    ...(name ? { name } : {})
+                    }
+            }]
         }) as RuleSetRule
     },
 
-    plugins: [
+    plugins: ({ cleanVerbose = false }: { cleanVerbose: boolean } = {cleanVerbose: false}) => ([
         new webpack.EnvironmentPlugin(['NODE_ENV']),
         new CleanWebpackPlugin({
             cleanOnceBeforeBuildPatterns: [
-                `${folders.dist()}/**/*`
+                `${folders.dist()}/**/*`,
+                `!${folders.dist()}/stats.json`
             ],
-            verbose: true
+            verbose: cleanVerbose
         })
-    ] as Plugin[]
+    ]) as Plugin[]
 })

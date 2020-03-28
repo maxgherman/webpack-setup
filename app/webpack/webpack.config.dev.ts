@@ -1,13 +1,7 @@
-import path from 'path'
 import { Configuration } from 'webpack'
 import HtmlWebpackPlugin from 'html-webpack-plugin';
-import CopyPlugin from 'copy-webpack-plugin'
 import ManifestPlugin from 'webpack-manifest-plugin'
-import Environments from './environments.js'
 import { getParts, folders } from './parts'
-
-const environments = Environments()
-console.log(`Running webpack config for environment: ${environments.current}`)
 
 const parts = getParts()
 
@@ -35,27 +29,26 @@ const config: Configuration = {
             },
             {
                 test: /\.pcss$/,
-                use: ['style-loader', 'postcss-loader']
-            }
+                use: ['style-loader', 'css-loader', 'postcss-loader']
+            },
+            parts.rules.fonts()
         ]
     },
 
     node: parts.node,
 
     plugins: [
-        ...parts.plugins,
+        ...parts.plugins({ cleanVerbose: true }),
         new HtmlWebpackPlugin({
             chunksSortMode: 'auto',
             filename: 'index.html',
-            favicon: '../assets/favicons/favicon.ico',
+            favicon: folders.assets.favicon,
             alwaysWriteToDisk: true,
             minify: false
         }),
-        new CopyPlugin([{
-            from:  `${folders.assets.fonts}/**/*`,
-            to: path.resolve(folders.dist(), 'assets')
-        }]),
-       new ManifestPlugin()
+        new ManifestPlugin({
+            fileName: 'asset-manifest.json'
+        })
     ],
 
     optimization: {

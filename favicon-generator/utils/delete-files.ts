@@ -1,10 +1,10 @@
 import del from 'del'
-import { configuration } from '../config'
+import { Config } from './common'
 
-export const deleteFiles = async () => {
+export const deleteFiles = async (config: Config): Promise<void> => {
     const deletedFiles = await del([
-        `${configuration.destination}/**/*`,
-        `!${configuration.destination}`
+        `${config.destination}/**/*`,
+        `!${config.destination}`
     ], {
         force: true
     })

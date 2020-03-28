@@ -1,13 +1,13 @@
 import util from 'util'
+import { Result, Config } from './common'
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const favicons = require('favicons')
-import { Result } from './common'
-import { configuration } from '../config'
 
 const favIcons: (source: string, configuration: {}) => Promise<Result>
     = util.promisify(favicons)
 
-export const generate = async () => {
-    const data = await favIcons(configuration.source, configuration.favicons)
+export const generate = async (config: Config): Promise<Result> => {
+    const data = await favIcons(config.source, config.favicons)
 
     data.html.sort((a, b) => {
         const aValue = a.substring(0, 5)
@@ -29,10 +29,9 @@ export const generate = async () => {
             return acc
         }
 
-        const replacement = `href="${matches.groups['value']}"`;
-        return acc.concat(curr.replace(/href.*=.*".*"/, replacement))
+        return acc.concat(curr)
 
-    }, [] as string[]);
+    }, [] as string[])
 
     return data
 }

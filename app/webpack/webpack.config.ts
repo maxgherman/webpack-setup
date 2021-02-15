@@ -1,12 +1,14 @@
 import { Configuration } from 'webpack'
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
-import ManifestPlugin from 'webpack-manifest-plugin'
-import HtmlWebpackPlugin from 'html-webpack-plugin';
+import { WebpackManifestPlugin } from 'webpack-manifest-plugin'
+import HtmlWebpackPlugin from 'html-webpack-plugin'
 import CopyPlugin from 'copy-webpack-plugin'
 import TerserPlugin from 'terser-webpack-plugin'
+import Environments from './environments'
 import { getParts, folders } from './parts'
 import { requireManifest, generatePlain, generateFromManifest } from './manifest'
 
+const environment  = Environments()
 const readManifest = requireManifest(folders.assets.faviconsManifest)
 const parts = getParts()
 
@@ -45,10 +47,10 @@ const config: Configuration = {
         ]
     },
 
-    node: parts.node,
-
     plugins: [
-        ...parts.plugins(),
+        ...parts.plugins({
+            remoteAppUrl: environment.remoteAppUrl
+        }),
         new HtmlWebpackPlugin({
             chunksSortMode: 'auto',
             filename: './index.html',
@@ -61,7 +63,7 @@ const config: Configuration = {
             chunkFilename: 'css/[name].[contenthash:8].css',
         }),
 
-        new ManifestPlugin({
+        new WebpackManifestPlugin({
             fileName: 'asset-manifest.json',
             generate: (_, files) =>
                 readManifest.result ?
@@ -69,10 +71,12 @@ const config: Configuration = {
                     generatePlain(files)
         }),
 
-        new CopyPlugin([{
-            from: folders.assets.favicons,
-            to: folders.dist()
-        }]),
+        new CopyPlugin({
+            patterns: [{
+                from: folders.assets.favicons,
+                to: folders.dist()
+            }]
+        }),
     ],
 
     performance: {
@@ -80,7 +84,7 @@ const config: Configuration = {
     },
 
     optimization: {
-        moduleIds: 'hashed',
+        moduleIds: 'deterministic',
         minimize: true,
         removeAvailableModules: true,
         usedExports: true,
@@ -94,17 +98,17 @@ const config: Configuration = {
             cacheGroups: {
                 vendors: {
                     test: /[\\/]node_modules[\\/]/i,
-                    name(module: { context: string }) {
+                    name(module: { context: string }): string {
                         const packageName =
                             module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)![1]
-                            .toLowerCase();
+                            .toLowerCase()
 
                         if(packageName.startsWith('core-js') ||
                             packageName.startsWith('babel')) {
                             return 'vendor.babel'
                         }
 
-                        return `vendor.${packageName.replace('@', '')}`;
+                        return `vendor.${packageName.replace('@', '')}`
                     }
                 }
             }
@@ -117,20 +121,18 @@ const config: Configuration = {
                     comparisons: false,
                     ecma: 5,
                     inline: true,
-                    warnings: false,
                   },
                   keep_classnames: true,
                   keep_fnames: true,
                   parse: {
-                    ecma: 8,
+                    ecma: 2019,
                   },
                   output: {
                     ascii_only: true,
                     ecma: 5,
                     comments: false,
                   },
-                },
-                sourceMap: true,
+                }
               })
         ]
     }

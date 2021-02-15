@@ -1,8 +1,10 @@
 import { Configuration } from 'webpack'
-import HtmlWebpackPlugin from 'html-webpack-plugin';
-import ManifestPlugin from 'webpack-manifest-plugin'
+import HtmlWebpackPlugin from 'html-webpack-plugin'
+import { WebpackManifestPlugin } from 'webpack-manifest-plugin'
+import Environments from './environments'
 import { getParts, folders } from './parts'
 
+const environment  = Environments()
 const parts = getParts()
 
 const config: Configuration = {
@@ -13,7 +15,7 @@ const config: Configuration = {
 
     entry: parts.entry,
 
-    devtool: 'cheap-module-eval-source-map',
+    devtool: 'eval',
 
     output: parts.output,
 
@@ -35,10 +37,11 @@ const config: Configuration = {
         ]
     },
 
-    node: parts.node,
-
     plugins: [
-        ...parts.plugins({ cleanVerbose: true }),
+        ...parts.plugins({
+            cleanVerbose: true,
+            remoteAppUrl: environment.remoteAppUrl || 'app2@http://localhost:8081/remoteEntry.js'
+        }),
         new HtmlWebpackPlugin({
             chunksSortMode: 'auto',
             filename: 'index.html',
@@ -46,7 +49,7 @@ const config: Configuration = {
             alwaysWriteToDisk: true,
             minify: false
         }),
-        new ManifestPlugin({
+        new WebpackManifestPlugin({
             fileName: 'asset-manifest.json'
         })
     ],
@@ -71,7 +74,8 @@ const config: Configuration = {
         overlay: true,
         hot: true,
         open: true,
-        writeToDisk: true
+        writeToDisk: true,
+        port: process.env.PORT ? Number(process.env.PORT) : 8080
     }
 }
 

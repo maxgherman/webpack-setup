@@ -45,31 +45,18 @@ const main = async (): Promise<void> => {
 
         ...(isHttps ? {
             https: {
-                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                key: certificate!.serviceKey,
-                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                cert: certificate!.certificate
+                key: certificate?.serviceKey,
+                cert: certificate?.certificate
             },
             http2: true
         } : {}),
         logger: {
-            timestamp: false,
-            prettyPrint: { colorize: true },
-            serializers: {
-                req: (req: {
-                        method: string
-                        url: string
-                        headers: { [_: string]: string }
-                    }): string =>
-                    `${req.method} ${req.url} ${req.headers['user-agent'].substring(50)}`
-            }
+            prettyPrint: { colorize: true }
         }
     })
 
     app.register(compress)
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-    //@ts-ignore
     app.register(staticServe, {
         root: path.resolve(__dirname, dirParameter),
     })

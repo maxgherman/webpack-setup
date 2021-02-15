@@ -1,9 +1,33 @@
 import path from 'path'
-import webpack, { Entry, Output, Node, Resolve, Plugin, RuleSetRule, Options } from 'webpack'
+import webpack, {
+    Entry,
+    ResolveOptions,
+    RuleSetRule,
+    Configuration,
+    WebpackPluginInstance,
+    container
+} from 'webpack'
 import { CleanWebpackPlugin } from 'clean-webpack-plugin'
 
+const { ModuleFederationPlugin } = container
+
+type Output = Configuration["output"]
+type Rules = {
+    babel: RuleSetRule
+    images: (name?: string) => RuleSetRule
+    fonts: (name?: string) => RuleSetRule
+}
+type Parts = {
+    context: string
+    entry: Entry
+    output: Output
+    resolve: ResolveOptions
+    rules: Rules
+    plugins: (param: { cleanVerbose?: boolean; remoteAppUrl?: string }) => WebpackPluginInstance[]
+}
+
 export const folders = {
-    dist: () => path.resolve(__dirname, '../dist'),
+    dist: (): string => path.resolve(__dirname, '../dist'),
     assets: {
         favicon: './assets/favicons/favicon.ico',
         favicons: './assets/favicons',
@@ -11,27 +35,23 @@ export const folders = {
     }
 }
 
-export const getParts = () => ({
+export const getParts = (): Parts => ({
     context: path.join(__dirname, '../.'),
 
     entry: {
         main: './src/index'
-    } as Entry,
+    },
 
     output: {
         path: folders.dist(),
         filename: '[name].js',
         publicPath: '/'
-    } as Output,
-
-    node: {
-        fs: 'empty'
-    } as Node,
+    },
 
     resolve: {
-        extensions: ['.ts', '.js', '.json']
-    } as Resolve,
-
+        extensions: ['.ts', '.js', '.json'],
+        fallback: { fs: false }
+    },
 
     rules: {
         babel: {
@@ -58,7 +78,7 @@ export const getParts = () => ({
                         ...(name ? { name } : {})
                     }
                 }]
-        }) as RuleSetRule,
+        }),
 
         fonts: (name?: string) => ({
             test: /\.(woff|woff2)$/,
@@ -69,17 +89,30 @@ export const getParts = () => ({
                     ...(name ? { name } : {})
                     }
             }]
-        }) as RuleSetRule
+        })
     },
 
-    plugins: ({ cleanVerbose = false }: { cleanVerbose: boolean } = {cleanVerbose: false}) => ([
-        new webpack.EnvironmentPlugin(['NODE_ENV']),
-        new CleanWebpackPlugin({
-            cleanOnceBeforeBuildPatterns: [
-                `${folders.dist()}/**/*`,
-                `!${folders.dist()}/stats.json`
-            ],
-            verbose: cleanVerbose
-        })
-    ]) as Plugin[]
+    plugins: ({ cleanVerbose, remoteAppUrl}) => {
+        if(!remoteAppUrl) {
+            throw new Error('Missing remoteAppUrl value')
+        }
+
+        return [
+            new webpack.EnvironmentPlugin(['NODE_ENV']),
+            new CleanWebpackPlugin({
+                cleanOnceBeforeBuildPatterns: [
+                    `${folders.dist()}/**/*`,
+                    `!${folders.dist()}/stats.json`
+                ],
+                verbose: cleanVerbose
+            }),
+            new ModuleFederationPlugin({
+                name: "app1",
+                remotes: {
+                    app2: remoteAppUrl,
+                },
+                shared: ["date-fns"]
+            })
+        ]
+    }
 })

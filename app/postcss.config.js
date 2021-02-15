@@ -1,16 +1,16 @@
-const postcssPresetEnv = require('postcss-preset-env');
-const cssnano = require('cssnano');
-const Environments = require('./webpack/environments');
+const postcssPresetEnv = require('postcss-preset-env')
+const cssnano = require('cssnano')
+const Environments = require('./webpack/environments')
 
 const prodPlugins = [
     cssnano({
         preset: 'default'
     })
-];
+]
 
 module.exports = function(ctx) {
 
-    const environments = Environments(ctx.env);
+    const environments = Environments(ctx.env)
 
     return {
         plugins: [
@@ -21,5 +21,5 @@ module.exports = function(ctx) {
                 }
         })]
         .concat(environments.isProduction ? prodPlugins : [])
-    };
+    }
 }

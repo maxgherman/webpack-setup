@@ -10,13 +10,6 @@
     "running": false
 },
 {
-    "name": "webpack",
-    "path": [
-        "../app/dist/vendor.webpack*.js"
-    ],
-    "running": false
-},
-{
     "name": "vendor",
     "path": [
         "../app/dist/vendor.*.js",

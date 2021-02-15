@@ -23,3 +23,7 @@ export const createFrame = (): HTMLDivElement => {
     body.appendChild(result)
     return result
 }
+
+export const formatOClockDate = (date: Date): Promise<string> =>
+    import('date-fns')
+    .then(({ format }) => format(date, "h 'o''clock'"))

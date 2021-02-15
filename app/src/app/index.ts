@@ -1,7 +1,7 @@
 import './index.pcss'
 import { list as createList } from '@components/list'
 import { image as createImage } from '@components/image'
-import { toCapital, createFrame } from '@utils'
+import { toCapital, createFrame, formatOClockDate } from '@utils'
 
 import logo from '@img/logo.jpg'
 
@@ -24,11 +24,20 @@ export const render = (): void => {
     const list = createList()
     list.render(frame)
 
+    formatOClockDate(new Date())
+    .then(list.addItem)
+    .catch(console.log)
+
     const interval = setInterval((): void => {
         const next = f.next()
 
         if(next.done) {
             clearInterval(interval)
+
+            import('app2/Text')
+            .then(({ Text }) => {
+                list.addItem(Text('Hello webpack'))
+            })
             return
         }
 

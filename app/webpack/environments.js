@@ -27,6 +27,10 @@ module.exports = (env) => {
 
         get current() {
             return env
+        },
+
+        get remoteAppUrl() {
+            return process.env.REMOTE_APP_URL
         }
     }
 }

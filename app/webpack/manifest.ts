@@ -14,7 +14,7 @@ export type ManifestRead = {
     result: boolean
 }
 
-export type FileDescriptors = { name: string | null, path: string }[]
+export type FileDescriptors = { name: string | null; path: string }[]
 
 export const requireManifest = (manifestPath: string): ManifestRead => {
 
@@ -33,16 +33,16 @@ export const requireManifest = (manifestPath: string): ManifestRead => {
     }
 }
 
-export const generatePlain = (files: FileDescriptors) => {
+export const generatePlain = (files: FileDescriptors): Manifest => {
     return files.reduce((acc, curr) => {
-        acc[curr.name || ''] = curr.path;
-        return acc;
-    }, {} as Manifest);
+        acc[curr.name || ''] = curr.path
+        return acc
+    }, {} as Manifest)
 }
 
-export const generateFromManifest = (manifest: Manifest, files: FileDescriptors) => {
+export const generateFromManifest = (manifest: Manifest, files: FileDescriptors): Manifest => {
     return files.reduce((acc, curr) => {
-        acc[curr.name || ''] = curr.path;
+        acc[curr.name || ''] = curr.path
 
         const icon = acc.icons.find(item => {
             return curr.path.includes(path.parse(item.src).name)
@@ -52,6 +52,6 @@ export const generateFromManifest = (manifest: Manifest, files: FileDescriptors)
             icon.src = curr.path
         }
 
-        return acc;
-    }, manifest);
+        return acc
+    }, manifest)
 }

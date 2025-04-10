@@ -26,7 +26,7 @@
     "fastify": "3.29.4",
     "fastify-auto-push": "0.4.0",
     "fastify-compress": "3.4.1",
-    "lighthouse": "9.6.7",
+    "lighthouse": "12.5.1",
     "pem": "1.14.4",
     "pino-pretty": "4.5.0",
     "size-limit": "4.9.2",
